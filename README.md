@@ -1,5 +1,11 @@
 # 🛢️ PredictEdge AI
 
+ Live Demo
+
+**Try PredictEdge AI online:**
+
+[https://YOUR-APP.streamlit.app](https://predictedge-ai-gah5epberv3zyp2j2jjfbw.streamlit.app/)
+
 ### Machine Learning Powered Predictive Maintenance Dashboard
 
 PredictEdge AI is an interactive machine learning web application developed using **Python** and **Streamlit** that predicts the probability of industrial machine failure using operating sensor data.
