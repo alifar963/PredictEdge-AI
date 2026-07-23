@@ -4,7 +4,7 @@
 
 **Try PredictEdge AI online:**
 
-[https://YOUR-APP.streamlit.app](https://predictedge-ai-gah5epberv3zyp2j2jjfbw.streamlit.app/)
+(https://predictedge-ai-gah5epberv3zyp2j2jjfbw.streamlit.app/)
 
 ### Machine Learning Powered Predictive Maintenance Dashboard
 
