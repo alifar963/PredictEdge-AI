@@ -1,135 +1,167 @@
-# 🛢️ PredictEdge AI
+# 🛢 PredictEdge AI v2
 
- Live Demo
+**AI-Powered Predictive Maintenance Platform for Industrial Equipment**
 
-**Try PredictEdge AI online:**
+PredictEdge AI is an interactive machine learning application developed to demonstrate predictive maintenance and fault diagnosis for industrial equipment.
+
+The platform currently supports two independent AI modules:
+
+- ⚙️ Manufacturing Machine Failure Prediction
+- 🛢 Electric Submersible Pump (ESP) Fault Diagnosis
+
+Built using **Python, Scikit-learn, SHAP and Streamlit**, PredictEdge AI combines machine learning with explainable AI to provide engineers with transparent maintenance recommendations.
+
+---
+
+# 🚀 Live Demo
+
+🔗 **Live Application**
 
 (https://predictedge-ai-gah5epberv3zyp2j2jjfbw.streamlit.app/)
 
-### Machine Learning Powered Predictive Maintenance Dashboard
-
-PredictEdge AI is an interactive machine learning web application developed using **Python** and **Streamlit** that predicts the probability of industrial machine failure using operating sensor data.
-
-The application combines predictive analytics with AI explainability (SHAP) to provide engineers with both failure predictions and an explanation of the factors influencing each prediction.
-
 ---
 
-## 📌 Project Overview
+# 📌 Features
 
-Industrial equipment failures can result in costly downtime, reduced productivity, and increased maintenance expenses.
+## Version 1 – Manufacturing Machine Failure Prediction
 
-PredictEdge AI demonstrates how machine learning can support predictive maintenance by analyzing machine operating parameters and estimating the likelihood of equipment failure before it occurs.
+Predicts whether an industrial manufacturing machine is likely to fail based on operating conditions.
 
-The dashboard enables users to:
-
-- Predict machine failure in real time
-- View machine health and failure probability
-- Assess operational risk
-- Understand AI decisions using SHAP explainability
-- Identify the most influential operating parameters
-- Support engineering maintenance decisions
-
----
-
-## 🚀 Features
-
-- Interactive Streamlit dashboard
-- Real-time machine failure prediction
-- Machine health and failure probability
-- Risk level classification (Low / Medium / High)
-- SHAP AI Explainability
-- Global feature importance visualization
-- AI-generated maintenance recommendations
-- Clean engineering dashboard interface
-
----
-
-## 📊 Machine Learning Model
-
-**Algorithm**
-
-- Random Forest Classifier
-
-**Model Performance**
-
-| Metric | Score |
-|---------|-------|
-| Accuracy | **98.40%** |
-| Precision | **85.37%** |
-| Recall | **57.38%** |
-| F1 Score | **68.63%** |
-
-The deployed model was selected after comparing multiple Random Forest configurations and demonstrated the best overall performance on the test dataset.
-
----
-
-## 📈 Input Parameters
-
-The model predicts machine failure using the following operating parameters:
-
-- Air Temperature
-- Process Temperature
-- Rotational Speed (RPM)
-- Torque
-- Tool Wear
-- Machine Type (L / M / H)
-
----
-
-## 🧠 Explainable AI
-
-PredictEdge AI uses **SHAP (SHapley Additive exPlanations)** to explain every prediction.
-
-Rather than only displaying whether a machine is predicted to fail, the application also identifies:
-
-- Features that increased failure risk
-- Features that reduced failure risk
-- Relative contribution of each parameter
-
-This improves transparency and helps engineers understand the reasoning behind each prediction.
-
----
-
-## 🛠️ Technology Stack
-
-- Python
-- Streamlit
-- Scikit-learn
-- Pandas
-- NumPy
-- SHAP
-- Joblib
-
----
-
-## 📂 Dataset
-
-This project uses the **AI4I 2020 Predictive Maintenance Dataset**, which contains simulated industrial machine operating data including:
+### Input Parameters
 
 - Air Temperature
 - Process Temperature
 - Rotational Speed
 - Torque
 - Tool Wear
-- Machine Failure Labels
+- Machine Type (H / M / L)
+
+### AI Output
+
+- Machine Health
+- Failure Probability
+- Risk Level
+- SHAP Explainability
+- AI Generated Maintenance Summary
+- Maintenance Recommendation
+- Global Feature Importance
 
 ---
 
-## 📷 Dashboard Preview
+## Version 2 – ESP Fault Diagnosis
 
-*Screenshots will be added here.*
+Diagnoses operating conditions of Electric Submersible Pumps using vibration features.
+
+### Input Parameters
+
+- Median Vibration (8–13 Hz)
+- RMS Vibration (98–102 Hz)
+- Median Vibration (98–102 Hz)
+- 1× Rotational Peak
+- 2× Rotational Peak
+- Feature A
+- Feature B
+
+### AI Output
+
+- ESP Operating Condition
+- Prediction Confidence
+- Risk Level
+- SHAP Explainability
+- AI Generated Diagnostic Summary
+- Fault-specific Maintenance Recommendation
+- Global Feature Importance
+
+Supported Conditions
+
+- ✅ Normal
+- ⚠️ Unbalance
+- ⚠️ Misalignment
+- ⚠️ Rubbing
+- ⚠️ Faulty Sensor
 
 ---
 
-## ⚙️ Installation
+# 🧠 Explainable AI
+
+PredictEdge AI integrates **SHAP (SHapley Additive Explanations)**.
+
+Instead of providing only a prediction, the system explains:
+
+- Which parameters contributed most
+- Whether each parameter increased or reduced risk
+- Top contributing features
+- AI-generated engineering summary
+
+This improves model transparency and helps engineers understand the reasoning behind each prediction.
+
+---
+
+# 📊 Model Performance
+
+## Manufacturing Model
+
+| Metric | Score |
+|---------|-------|
+| Accuracy | 98.40% |
+| Precision | 85.37% |
+| Recall | 57.38% |
+| F1 Score | 68.63% |
+
+---
+
+## ESP Fault Diagnosis Model
+
+| Metric | Score |
+|---------|-------|
+| Accuracy | 94.20% |
+| Precision | 95.27% |
+| Recall | 94.20% |
+| F1 Score | 94.54% |
+
+---
+
+# 🛠 Technology Stack
+
+- Python
+- Streamlit
+- Scikit-learn
+- SHAP
+- Pandas
+- NumPy
+- Matplotlib
+- Joblib
+
+---
+
+# 📂 Project Structure
+
+```
+PredictEdge AI
+│
+├── app.py
+├── models/
+│   ├── random_forest_balanced.pkl
+│   ├── esp_model.pkl
+│   └── esp_label_encoder.pkl
+│
+├── train_model.py
+├── train_esp_model.py
+├── requirements.txt
+└── README.md
+```
+
+---
+
+# ⚙ Installation
 
 Clone the repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/PredictEdge-AI.git
+git clone https://github.com/yourusername/PredictEdge-AI.git
 ```
 
-Move into the project folder
+Navigate into the project
 
 ```bash
 cd PredictEdge-AI
@@ -149,35 +181,29 @@ streamlit run app.py
 
 ---
 
-## 🎯 Future Improvements
+# 🎯 Future Improvements
 
-- Hyperparameter optimization
-- Additional machine learning models (XGBoost / LightGBM)
-- Model comparison dashboard
-- Predictive maintenance scheduling
-- PDF report generation
-- Cloud deployment with real-time monitoring
+- Additional industrial equipment modules
+- Real-time IoT sensor integration
+- Condition probability visualization
+- PDF maintenance reports
+- Cloud deployment with user authentication
+- Deep learning models for vibration analysis
 
 ---
 
-## 👨‍💻 Developer
+# 👨‍💻 Author
 
 **Ali Farooq**
 
-Electrical Engineer
+Electrical Engineer | Machine Learning Enthusiast | Predictive Maintenance
 
-National University of Sciences and Technology (NUST)
+GitHub:
+(Add GitHub Link)
 
-Interested in:
-
-- Artificial Intelligence
-- Predictive Maintenance
-- Industrial Automation
-- Oil & Gas Technologies
-- Data Analytics
+LinkedIn:
+(Add LinkedIn Link)
 
 ---
 
-## 📄 License
-
-This project was developed for educational and portfolio purposes.
+## ⭐ If you found this project interesting, consider giving it a star!
