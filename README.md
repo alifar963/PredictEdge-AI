@@ -1,15 +1,10 @@
-# 🛢 PredictEdge AI v2
+# 🛢 PredictEdge AI v3
 
-**AI-Powered Predictive Maintenance Platform for Industrial Equipment**
+**AI-Powered Predictive Maintenance & Industrial Fault Diagnosis Platform**
 
-PredictEdge AI is an interactive machine learning application developed to demonstrate predictive maintenance and fault diagnosis for industrial equipment.
+PredictEdge AI is an interactive machine learning application designed to demonstrate predictive maintenance, industrial fault diagnosis, and explainable AI for multiple industrial systems.
 
-The platform currently supports two independent AI modules:
-
-- ⚙️ Manufacturing Machine Failure Prediction
-- 🛢 Electric Submersible Pump (ESP) Fault Diagnosis
-
-Built using **Python, Scikit-learn, SHAP and Streamlit**, PredictEdge AI combines machine learning with explainable AI to provide engineers with transparent maintenance recommendations.
+Built using **Python, Scikit-learn, SHAP, and Streamlit**, the platform enables engineers to analyze equipment health, understand AI predictions, and receive actionable maintenance recommendations.
 
 ---
 
@@ -17,13 +12,17 @@ Built using **Python, Scikit-learn, SHAP and Streamlit**, PredictEdge AI combine
 
 🔗 **Live Application**
 
-(https://predictedge-ai-gah5epberv3zyp2j2jjfbw.streamlit.app/)
+https://predictedge-ai-gah5epberv3zyp2j2jjfbw.streamlit.app/
 
 ---
 
 # 📌 Features
 
-## Version 1 – Manufacturing Machine Failure Prediction
+PredictEdge AI currently includes **three independent AI modules**.
+
+---
+
+# ⚙ Version 1 — Manufacturing Machine Failure Prediction
 
 Predicts whether an industrial manufacturing machine is likely to fail based on operating conditions.
 
@@ -38,19 +37,19 @@ Predicts whether an industrial manufacturing machine is likely to fail based on 
 
 ### AI Output
 
-- Machine Health
+- Machine Health Prediction
 - Failure Probability
-- Risk Level
+- Risk Assessment
 - SHAP Explainability
-- AI Generated Maintenance Summary
-- Maintenance Recommendation
+- AI Maintenance Summary
+- Maintenance Recommendations
 - Global Feature Importance
 
 ---
 
-## Version 2 – ESP Fault Diagnosis
+# 🛢 Version 2 — Electric Submersible Pump (ESP) Fault Diagnosis
 
-Diagnoses operating conditions of Electric Submersible Pumps using vibration features.
+Diagnoses operating conditions of Electric Submersible Pumps using vibration-based features.
 
 ### Input Parameters
 
@@ -59,20 +58,19 @@ Diagnoses operating conditions of Electric Submersible Pumps using vibration fea
 - Median Vibration (98–102 Hz)
 - 1× Rotational Peak
 - 2× Rotational Peak
-- Feature A
-- Feature B
+- Additional vibration features
 
 ### AI Output
 
 - ESP Operating Condition
 - Prediction Confidence
-- Risk Level
+- Operational Status
 - SHAP Explainability
-- AI Generated Diagnostic Summary
-- Fault-specific Maintenance Recommendation
+- AI Diagnostic Summary
+- Maintenance Recommendations
 - Global Feature Importance
 
-Supported Conditions
+### Supported Conditions
 
 - ✅ Normal
 - ⚠️ Unbalance
@@ -82,24 +80,75 @@ Supported Conditions
 
 ---
 
+# ⛽ Version 3 — Oil Well Event Detection (Petrobras 3W)
+
+Automatically analyzes raw oil well sensor recordings and classifies operational events using the Petrobras 3W dataset.
+
+Unlike the previous modules, users upload a complete well recording and PredictEdge AI automatically extracts statistical features before performing classification.
+
+### Raw Sensor Inputs
+
+- P-TPT
+- T-TPT
+- P-MON-CKP
+- T-JUS-CKP
+
+### Automatic Feature Engineering
+
+For each sensor, PredictEdge AI extracts:
+
+- Mean
+- Standard Deviation
+- Minimum
+- Maximum
+- Median
+
+These engineered features are automatically passed to the machine learning model.
+
+### AI Output
+
+- Detected Well Event
+- Prediction Confidence
+- Operational Status
+- Priority Level
+- SHAP Explainability
+- Top Contributing Features
+- AI Well Report
+- Engineering Recommendations
+
+### Supported Events
+
+- ✅ Normal Operation
+- Abrupt Increase of BSW
+- Spurious Closure of DHSV
+- Severe Slugging
+- Flow Instability
+- Rapid Productivity Loss
+- Quick Restriction in PCK
+- Scaling in PCK
+- Hydrate in Production Line
+
+---
+
 # 🧠 Explainable AI
 
-PredictEdge AI integrates **SHAP (SHapley Additive Explanations)**.
+PredictEdge AI integrates **SHAP (SHapley Additive Explanations)** to explain every prediction.
 
-Instead of providing only a prediction, the system explains:
+Instead of providing only a classification, the system identifies:
 
-- Which parameters contributed most
-- Whether each parameter increased or reduced risk
-- Top contributing features
-- AI-generated engineering summary
+- Most influential features
+- Positive and negative feature contributions
+- Top contributing parameters
+- Prediction confidence
+- AI-generated engineering reports
 
-This improves model transparency and helps engineers understand the reasoning behind each prediction.
+This improves transparency and helps engineers understand the reasoning behind each prediction.
 
 ---
 
 # 📊 Model Performance
 
-## Manufacturing Model
+## Manufacturing Machine Model
 
 | Metric | Score |
 |---------|-------|
@@ -121,6 +170,17 @@ This improves model transparency and helps engineers understand the reasoning be
 
 ---
 
+## Petrobras 3W Oil Well Model
+
+| Metric | Score |
+|---------|-------|
+| Accuracy | 96.73% |
+| Precision | 96.77% |
+| Recall | 96.73% |
+| F1 Score | 96.72% |
+
+---
+
 # 🛠 Technology Stack
 
 - Python
@@ -136,17 +196,22 @@ This improves model transparency and helps engineers understand the reasoning be
 
 # 📂 Project Structure
 
-```
+```text
 PredictEdge AI
 │
 ├── app.py
 ├── models/
 │   ├── random_forest_balanced.pkl
 │   ├── esp_model.pkl
-│   └── esp_label_encoder.pkl
+│   ├── esp_label_encoder.pkl
+│   └── 3w_model.pkl
 │
-├── train_model.py
-├── train_esp_model.py
+├── scripts/
+│   ├── train_model.py
+│   ├── train_esp_model.py
+│   ├── feature_engineering_3w.py
+│   └── train_3w.py
+│
 ├── requirements.txt
 └── README.md
 ```
@@ -183,12 +248,14 @@ streamlit run app.py
 
 # 🎯 Future Improvements
 
-- Additional industrial equipment modules
+- Wireline Risk Advisor
+- Slickline Failure Prediction
 - Real-time IoT sensor integration
-- Condition probability visualization
-- PDF maintenance reports
-- Cloud deployment with user authentication
-- Deep learning models for vibration analysis
+- PDF engineering reports
+- Interactive dashboards
+- Cloud database integration
+- User authentication
+- Deep learning models for industrial diagnostics
 
 ---
 
@@ -196,14 +263,14 @@ streamlit run app.py
 
 **Ali Farooq**
 
-Electrical Engineer | Machine Learning Enthusiast | Predictive Maintenance
+Electrical Engineer | Machine Learning Engineer | Predictive Maintenance
 
 GitHub:
-(Add GitHub Link)
+https://github.com/alifar963
 
 LinkedIn:
-(Add LinkedIn Link)
+(Add your LinkedIn profile)
 
 ---
 
-## ⭐ If you found this project interesting, consider giving it a star!
+## ⭐ If you found this project useful, consider giving it a star!
