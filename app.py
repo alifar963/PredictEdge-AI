@@ -2,11 +2,14 @@ import streamlit as st
 import shap
 import joblib
 import pandas as pd
+
+
 st.set_page_config(
     page_title="PredictEdge AI",
     page_icon="🛢",
     layout="wide"
 )
+
 with st.sidebar:
 
     st.title("🛢️ PredictEdge AI")
@@ -779,6 +782,29 @@ elif st.session_state.page == "oilwell":
     if st.button("⬅ Back"):
         st.session_state.page = "home"
         st.rerun()
+
+    st.divider()
+
+    st.subheader("📊 Model Performance")
+
+    col1, col2, col3, col4 = st.columns(4)
+
+    with col1:
+          st.metric("Accuracy", "96.73%")
+
+    with col2:
+          st.metric("Precision", "96.77%")
+
+    with col3:
+          st.metric("Recall", "96.73%")
+
+    with col4:
+          st.metric("F1 Score", "96.72%")
+
+    st.caption(
+               "Performance measured on the Petrobras 3W test dataset using a Random Forest classifier."
+          )
+    
 
     st.subheader("⛽ Oil Well Event Detection (Petrobras 3W)")
 
