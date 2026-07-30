@@ -39,7 +39,7 @@ x_train, x_test, y_train, y_test = train_test_split(
 )
 #training on 500 trees
 model = RandomForestClassifier(
-    n_estimators=200,
+    n_estimators=300,
     random_state=42,
     class_weight="balanced"
 )
@@ -78,7 +78,10 @@ print(confusion_matrix(y_test, predictions))
 
 print("\nClassification Report")
 print(classification_report(y_test, predictions))
+print(df.shape)
+print(df["label"].value_counts())  # class balance
+print(df.describe())
 
-joblib.dump(model, "models/esp_model.pkl")
-joblib.dump(encoder, "models/esp_label_encoder.pkl")
+#joblib.dump(model, "models/esp_model.pkl")
+#joblib.dump(encoder, "models/esp_label_encoder.pkl")
 

@@ -45,10 +45,12 @@ Version **2.0**
 
 manufacturing_model = joblib.load("models/random_forest_v1.pkl")
 esp_model = joblib.load("models/esp_model.pkl")
+oilwell_model = joblib.load("models/3w_model.pkl")
 esp_encoder = joblib.load("models/esp_label_encoder.pkl")
 
 manufacturing_explainer = shap.TreeExplainer(manufacturing_model)
 esp_explainer = shap.TreeExplainer(esp_model)
+oilwell_explainer = shap.TreeExplainer(oilwell_model)
 
 st.title("🛢️ PredictEdge AI")
 if "page" not in st.session_state:
@@ -66,7 +68,7 @@ if st.session_state.page == "home":
      """
      )
      st.write("Select the Equipment you want to Diagnose.")
-     col1, col2 = st.columns(2)
+     col1, col2, col3 = st.columns(3)
      with col1:
           st.markdown("### ⚙ Manufacturing Machine")
           st.caption("Motor • Bearings • Machine Health")
@@ -88,6 +90,16 @@ if st.session_state.page == "home":
         ):
               st.session_state.page = "esp"
               st.rerun()
+     with col3:
+            st.markdown("### ⛽ Oil Well Event Detection")
+            st.caption("Petrobras 3W Well Diagnostics")
+
+            if st.button(
+              "Open Oil Well Module",
+              use_container_width=True
+        ):
+               st.session_state.page = "oilwell"
+               st.rerun()
 
 
 elif  st.session_state.page == "manufacturing":
@@ -503,7 +515,7 @@ elif st.session_state.page == "esp":
                 "a": [feature_a],
                 "b": [feature_b]
           })
-        
+          st.write(input_data)
           prediction = esp_model.predict(input_data)
           probability = esp_model.predict_proba(input_data)
           prob_df = pd.DataFrame({
@@ -762,6 +774,382 @@ Recommended Maintenance Actions:
                importance_df.set_index("Feature")
           )
 
+elif st.session_state.page == "oilwell":
+
+    if st.button("⬅ Back"):
+        st.session_state.page = "home"
+        st.rerun()
+
+    st.subheader("⛽ Oil Well Event Detection (Petrobras 3W)")
+
+    st.markdown("""
+    Upload a Petrobras 3W well recording CSV file.
+    PredictEdge AI will automatically extract statistical features
+    and classify the operational event detected in the well.
+    """)
+
+    uploaded_file = st.file_uploader(
+        "Upload Well CSV File",
+        type="csv"
+    )
+
+    if uploaded_file is not None:
+
+        raw_df = pd.read_csv(uploaded_file)
+
+        st.success("CSV file loaded successfully!")
+
+        st.write("### Raw Sensor Data Preview")
+        st.dataframe(raw_df.head())
+
+        sensor_columns = [
+            "P-TPT",
+            "T-TPT",
+            "P-MON-CKP",
+            "T-JUS-CKP"
+        ]
+
+        features = {}
+
+        for sensor in sensor_columns:
+            features[f"{sensor}_mean"] = raw_df[sensor].mean()
+            features[f"{sensor}_std"] = raw_df[sensor].std()
+            features[f"{sensor}_min"] = raw_df[sensor].min()
+            features[f"{sensor}_max"] = raw_df[sensor].max()
+            features[f"{sensor}_median"] = raw_df[sensor].median()
+
+        input_data = pd.DataFrame([features])
+
+        st.write("### Extracted Statistical Features")
+        st.dataframe(input_data)
+        st.divider()
+
+        prediction = oilwell_model.predict(input_data)
+        probabilities = oilwell_model.predict_proba(input_data)
+
+       
+
+        event_names = {
+          0: "Normal Operation",
+          1: "Abrupt Increase of BSW",
+          2: "Spurious Closure of DHSV",
+          3: "Severe Slugging",
+          4: "Flow Instability",
+          5: "Rapid Productivity Loss",
+          6: "Quick Restriction in PCK",
+          7: "Scaling in PCK",
+          8: "Hydrate in Production Line"
+         }
+        
+        predicted_class = int(prediction[0])
+        confidence = probabilities[0][predicted_class] * 100
+        predicted_event = event_names[predicted_class]
+        if predicted_event == "Normal Operation":
+          status = "🟢 Healthy"
+          priority = "Routine Monitoring"
+
+        elif predicted_event in [
+          "Abrupt Increase of BSW",
+          "Flow Instability"
+        ]:
+          status = "🟡 Attention Required"
+          priority = "Monitor Closely"
+
+        elif predicted_event in [
+          "Rapid Productivity Loss",
+          "Quick Restriction in PCK",
+          "Scaling in PCK"
+        ]:
+          status = "🟠 Maintenance Recommended"
+          priority = "Schedule Maintenance"
+
+        elif predicted_event in [
+          "Severe Slugging",
+          "Hydrate in Production Line",
+          "Spurious Closure of DHSV"
+        ]:
+          status = "🔴 Critical"
+          priority = "Immediate Intervention"
+
+        else:
+          status = "⚪ Unknown"
+          priority = "Review Required"
+
+
+        col1, col2, col3, col4 = st.columns(4)
+        st.divider()
+                
+        with col1:
+                    st.metric(
+                         "Detected Event",
+                         predicted_event
+                    )
+                
+        with col2:
+                    st.metric(
+                           "Confidence",
+                           f"{confidence:.1f}%"
+                    )
+                
+        with col3:
+                    st.metric("Operatonal Status", status)
+        with col4:
+                    st.metric("Priority", priority)
+       
+
+
+        shap_values = oilwell_explainer(input_data)
+        event_shap = shap_values.values[0, :, predicted_class]
+        shap_df = pd.DataFrame({
+          "Feature": input_data.columns,
+          "SHAP Value": event_shap
+        })
+        shap_df["Contribution"] = (
+          shap_df["SHAP Value"].abs()
+          / shap_df["SHAP Value"].abs().sum()
+        ) * 100
+
+        shap_df["Direction"] = shap_df["SHAP Value"].apply(
+          lambda x: "🔴 Increased Prediction"
+          if x > 0 else "🟢 Reduced Prediction"
+        )
+
+        shap_df = shap_df.sort_values(
+          by="Contribution",
+          ascending=False
+        )
+        
+        st.subheader("🧠 AI Decision Explanation (SHAP)")
+
+        chart = (
+          shap_df
+          .set_index("Feature")["Contribution"]
+        )
+        st.bar_chart(chart)
+
+        top3 = shap_df.head(3)
+
+        st.markdown("### Top Contributing Factors")
+
+        for _, row in top3.iterrows():
+
+         st.write(
+          f"{row['Direction']} **{row['Feature']}** "
+          f"({row['Contribution']:.1f}%)"
+         )
+
+         top_features = ", ".join(
+          top3["Feature"].tolist()
+         )
+        if predicted_event == "Normal Operation":
+
+          summary = f"""
+Prediction Outcome:
+
+Well Status: Normal Operation
+
+Prediction Confidence: {confidence:.1f}%
+
+The strongest contributing features were:
+
+{top_features}
+
+The well is operating within expected conditions.
+
+Recommended Actions:
+
+• Continue normal production.
+• Maintain routine monitoring.
+• Continue scheduled preventive maintenance.
+"""
+
+        elif predicted_event == "Abrupt Increase of BSW":
+
+          summary = f"""
+Prediction Outcome:
+
+Well Status: Abrupt Increase of BSW
+
+Prediction Confidence: {confidence:.1f}%
+
+The strongest contributing features were:
+
+{top_features}
+
+The model detected an abnormal increase in Basic Sediment & Water (BSW), which may indicate water breakthrough or changes in reservoir behavior.
+
+Recommended Actions:
+
+• Monitor water cut trends.
+• Review reservoir production history.
+• Inspect separator efficiency.
+• Evaluate production optimization options.
+"""
+
+        elif predicted_event == "Spurious Closure of DHSV":
+
+          summary = f"""
+Prediction Outcome:
+
+Well Status: Spurious Closure of Downhole Safety Valve
+
+Prediction Confidence: {confidence:.1f}%
+
+The strongest contributing features were:
+
+{top_features}
+
+The prediction indicates an unexpected closure of the Downhole Safety Valve.
+
+Recommended Actions:
+
+• Verify hydraulic control pressure.
+• Inspect DHSV control system.
+• Review shutdown logs.
+• Confirm valve functionality before restart.
+"""
+
+        elif predicted_event == "Severe Slugging":
+
+          summary = f"""
+Prediction Outcome:
+
+Well Status: Severe Slugging
+
+Prediction Confidence: {confidence:.1f}%
+
+The strongest contributing features were:
+
+{top_features}
+
+Large production flow oscillations consistent with severe slugging have been detected.
+
+Recommended Actions:
+
+• Monitor pressure fluctuations.
+• Adjust choke settings if appropriate.
+• Verify separator stability.
+• Continue close production monitoring.
+"""
+
+        elif predicted_event == "Flow Instability":
+
+          summary = f"""
+Prediction Outcome:
+
+Well Status: Flow Instability
+
+Prediction Confidence: {confidence:.1f}%
+
+The strongest contributing features were:
+
+{top_features}
+
+The production system is exhibiting unstable flow behavior.
+
+Recommended Actions:
+
+• Review pressure trends.
+• Inspect production choke.
+• Check for changing operating conditions.
+• Continue monitoring for escalation.
+"""
+
+        elif predicted_event == "Rapid Productivity Loss":
+
+          summary = f"""
+Prediction Outcome:
+
+Well Status: Rapid Productivity Loss
+
+Prediction Confidence: {confidence:.1f}%
+
+The strongest contributing features were:
+
+{top_features}
+
+The model indicates a significant reduction in production performance.
+
+Recommended Actions:
+
+• Compare current production with historical trends.
+• Investigate reservoir and well performance.
+• Inspect surface production equipment.
+• Plan engineering evaluation.
+"""
+
+        elif predicted_event == "Quick Restriction in PCK":
+
+          summary = f"""
+Prediction Outcome:
+
+Well Status: Quick Restriction in Production Choke
+
+Prediction Confidence: {confidence:.1f}%
+
+The strongest contributing features were:
+
+{top_features}
+
+A rapid restriction at the production choke has been detected.
+
+Recommended Actions:
+
+• Inspect the production choke.
+• Check for blockage or debris.
+• Verify choke valve operation.
+• Restore normal flow conditions.
+"""
+
+        elif predicted_event == "Scaling in PCK":
+
+          summary = f"""
+Prediction Outcome:
+
+Well Status: Scaling in Production Choke
+
+Prediction Confidence: {confidence:.1f}%
+
+The strongest contributing features were:
+
+{top_features}
+
+The prediction suggests scale buildup affecting the production choke.
+
+Recommended Actions:
+
+• Inspect for mineral deposits.
+• Review scaling tendency.
+• Schedule cleaning if required.
+• Consider chemical scale inhibition.
+"""
+
+        elif predicted_event == "Hydrate in Production Line":
+
+          summary = f"""
+Prediction Outcome:
+
+Well Status: Hydrate Formation
+
+Prediction Confidence: {confidence:.1f}%
+
+The strongest contributing features were:
+
+{top_features}
+
+The model detected conditions consistent with hydrate formation in the production line.
+
+Recommended Actions:
+
+• Verify line temperature and pressure.
+• Consider hydrate inhibition procedures.
+• Inspect production flow.
+• Monitor for blockage development.
+"""
+
+        st.subheader("🤖 AI Well Report")
+        st.info(summary)
+        
 
 
 st.divider()
