@@ -36,7 +36,7 @@ Electrical Engineer
 
 ---
 
-Version **2.0**
+Version **3.0**
 """)
     st.info("This dashboard is intended for predictive maintenance demonstrations. Predictions are to support inspection and maintenance decisions not replace them.")
 
@@ -1154,7 +1154,7 @@ Recommended Actions:
 
 st.divider()
 st.caption(
-     "PredictEdge AI v2.0   |  Developed by Ali Farooq   | "
+     "PredictEdge AI v3.0   |  Developed by Ali Farooq   | "
      "Python • Streamlit • Scikit-learn • SHAP"
 )
 print(esp_model.classes_)
